@@ -42,6 +42,7 @@ const getWindowContext = (c, t=top, cc="top") => {
     return null;
 };
 
+let ignoredSinks = JSON.parse(localStorage.getItem("ignoredSinks") || "[]")
 const log = (hook, type, sink, thisArg, sinkData, config) => {
     var stackTrace = trace();
     if (stackTrace[0] === "Error")
@@ -91,6 +92,12 @@ const log = (hook, type, sink, thisArg, sinkData, config) => {
     }
 
     if (checkRequired(config)) {
+        if (!ignoredSinks.includes(sink)) {
+	    console.groupCollapsed(`%c${sink}`, 'background: #758694; color: #FFF8F3; font-size: 12px')
+	    console.log({sink, type, sinkData, hook, href: location.href, frame: getWindowContext(self)});
+	    console.trace();
+	    console.groupEnd()
+        }
         domlogger.func["postMessage"](data, "*");
     }
 }
